@@ -70,6 +70,12 @@ $ brew install terminal-notifier
 
 <img src="https://github.com/coolcode/tomato-clock/blob/master/img/screenshot-ubuntu.png?raw=true" alt="ubuntu-notification" width="300"/>
 
+- Windows10
+
+`win10toast`
+
+<img src="img/screenshot-windows10.png" style="zoom:65%;" />
+
 
 
 ## Voice Notification
