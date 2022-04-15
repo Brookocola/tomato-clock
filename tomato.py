@@ -14,6 +14,8 @@
 import sys
 import time
 import subprocess
+from win10toast import ToastNotifier    #win10通知
+import _thread
 
 WORK_MINUTES = 25
 BREAK_MINUTES = 5
@@ -28,7 +30,11 @@ def main():
             tomato(BREAK_MINUTES, 'It is time to work')
 
         elif sys.argv[1] == '-t':
-            minutes = int(sys.argv[2]) if len(sys.argv) > 2 else WORK_MINUTES
+            #minutes = int(sys.argv[2]) if len(sys.argv) > 2 else WORK_MINUTES
+            if len(sys.argv)>2:
+                minutes=int(sys.argv[2])
+            else:
+                minutes=WORK_MINUTES
             print(f'🍅 tomato {minutes} minutes. Ctrl+C to exit')
             tomato(minutes, 'It is time to take a break')
 
@@ -44,7 +50,7 @@ def main():
             help()
 
     except KeyboardInterrupt:
-        print('\n👋 goodbye')
+        print('\n👋 goodbye')    #Ctrl+C退出时输出👋 goodbye
     except Exception as ex:
         print(ex)
         exit(1)
@@ -53,24 +59,25 @@ def main():
 def tomato(minutes, notify_msg):
     start_time = time.perf_counter()
     while True:
-        diff_seconds = int(round(time.perf_counter() - start_time))
-        left_seconds = minutes * 60 - diff_seconds
+        diff_seconds = int(round(time.perf_counter() - start_time))     #计算已过时间(秒)
+        left_seconds = minutes * 60 - diff_seconds      #计算剩余时间(秒)
         if left_seconds <= 0:
             print('')
             break
 
-        countdown = '{}:{} ⏰'.format(int(left_seconds / 60), int(left_seconds % 60))
-        duration = min(minutes, 25)
+        countdown = '{}:{} ⏰'.format(int(left_seconds / 60), int(left_seconds % 60))    #计算剩余时间
+        duration = min(minutes, 25)     #番茄总个数,最多25个
         progressbar(diff_seconds, minutes * 60, duration, countdown)
         time.sleep(1)
 
     notify_me(notify_msg)
 
-
+#🍅进度条显示
 def progressbar(curr, total, duration=10, extra=''):
-    frac = curr / total
-    filled = round(frac * duration)
+    frac = curr / total     #已过时间比例
+    filled = round(frac * duration)     #当前番茄个数
     print('\r', '🍅' * filled + '--' * (duration - filled), '[{:.0%}]'.format(frac), extra, end='')
+    #'\r'表示将光标的位置回退到本行的开头位置
 
 
 def notify_me(msg):
@@ -99,9 +106,16 @@ def notify_me(msg):
         elif sys.platform.startswith('linux'):
             # ubuntu desktop notification
             subprocess.Popen(["notify-send", '🍅', msg])
+        elif sys.platform=='win32':
+            # windows desktop notification
+            toaster = ToastNotifier()
+            toaster.show_toast("🍅",
+             msg,
+             icon_path=None,
+             duration=5,
+             threaded=True)
+            while toaster.notification_active(): time.sleep(0.1)
         else:
-            # windows?
-            # TODO: windows notification
             pass
 
     except:
