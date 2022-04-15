@@ -74,7 +74,7 @@ $ brew install terminal-notifier
 
 `win10toast`
 
-<img src="img/screenshot-windows10.png" style="zoom:65%;" />
+<img src="img/screenshot-windows10.png" style="zoom:55%;" />
 
 
 
